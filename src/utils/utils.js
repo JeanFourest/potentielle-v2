@@ -1,4 +1,4 @@
-const replyOrFollowUpEmbed = (interaction, message) => {
+const replyOrFollowUp = (interaction, message) => {
   if (interaction) {
     if (interaction.replied) {
       return interaction.followUp(message);
@@ -13,5 +13,5 @@ const replyOrFollowUpEmbed = (interaction, message) => {
 };
 
 module.exports = {
-  replyOrFollowUpEmbed,
+  replyOrFollowUp,
 };
