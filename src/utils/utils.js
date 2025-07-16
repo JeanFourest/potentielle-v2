@@ -26,17 +26,16 @@ const addMessageToDatabase = async (
   username,
   content
 ) => {
-  await pool.query(
-    "INSERT INTO messages (channel_id, user_id, username, content) VALUES ($1, $2, $3, $4)",
-    [channelId, userId, username, content],
-    (err) => {
-      if (err) {
-        console.error("Error inserting message into database:", err);
-      } else {
-        console.log("Message inserted successfully.");
-      }
-    }
-  );
+  try {
+    await pool.query(
+      "INSERT INTO messages (channel_id, user_id, username, content) VALUES ($1, $2, $3, $4)",
+      [channelId, userId, username, content]
+    );
+    console.log("Message inserted successfully.");
+    
+  } catch (e) {
+    console.error("Error inserting message into database:", e);
+  }
 };
 
 const openaiResponse = async (content) => {
