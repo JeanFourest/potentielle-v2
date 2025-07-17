@@ -1,4 +1,5 @@
 const { Events, MessageFlags } = require("discord.js");
+const { useMainPlayer } = require("discord-player");
 
 module.exports = {
   name: Events.InteractionCreate,
@@ -6,6 +7,7 @@ module.exports = {
     if (!interaction.isChatInputCommand()) return;
 
     const command = interaction.client.commands.get(interaction.commandName);
+    const player = useMainPlayer();
 
     if (!command) {
       console.error(
@@ -15,7 +17,10 @@ module.exports = {
     }
 
     try {
-      await command.execute(interaction);
+      const data = {
+        guild: interaction.guild,
+      };
+      await player.context.provide(data, () => command.execute(interaction));
     } catch (error) {
       console.error(error);
       if (interaction.replied || interaction.deferred) {

@@ -8,7 +8,7 @@ const { CLIENT_ID, GUILD_ID, TOKEN } = process.env;
 
 const commands = [];
 // Grab all the command folders from the commands directory you created earlier
-const foldersPath = path.join(__dirname, "commands");
+const foldersPath = path.join(__dirname, "..", "commands");
 const commandFiles = fs
   .readdirSync(foldersPath)
   .filter((file) => file.endsWith(".js"));
