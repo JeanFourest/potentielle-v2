@@ -8,12 +8,8 @@ const {
   AppleMusicExtractor,
   VimeoExtractor,
 } = require("@discord-player/extractor");
+const { initializeDatabase } = require("./db/db");
 const { YoutubeiExtractor } = require("discord-player-youtubei");
-
-require("dotenv").config();
-
-const { execSync } = require("child_process");
-console.log(execSync("ffmpeg -version").toString());
 
 const { TOKEN } = process.env;
 
@@ -34,14 +30,15 @@ const player = new Player(client);
 // Initialize player in an async function
 async function initializePlayer() {
   // Load all default extractors for better compatibility
-  /* await player.extractors.loadMulti(DefaultExtractors);
-  await player.extractors.register(YoutubeiExtractor, {}) */
+  console.log("[EXTRACTOR] Registering extractors...");
 
-  await player.extractors.register(YoutubeiExtractor, {});
-  await player.extractors.register(SoundCloudExtractor, {});
-  await player.extractors.register(SpotifyExtractor, {});
-  await player.extractors.register(AppleMusicExtractor, {});
-  await player.extractors.register(VimeoExtractor, {});
+  await player.extractors.register(YoutubeiExtractor);
+  await player.extractors.register(SoundCloudExtractor);
+  await player.extractors.register(SpotifyExtractor);
+  await player.extractors.register(AppleMusicExtractor);
+  await player.extractors.register(VimeoExtractor);
+
+  console.log("[EXTRACTOR] All extractors registered successfully.");
 }
 
 // Add debug events to understand what's happening
@@ -134,9 +131,13 @@ for (const musicFile of musicEventFiles) {
 // Initialize and start the bot
 async function startBot() {
   try {
+    console.log("Starting bot initialization...");
+
+    await initializeDatabase();
+
     await initializePlayer();
+
     await client.login(TOKEN);
-    console.log("Bot started successfully!");
   } catch (error) {
     console.error("Failed to start bot:", error);
     process.exit(1);
