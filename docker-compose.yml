@@ -20,8 +20,6 @@ services:
     command: npm run deploy-commands
     profiles:
       - tools
-    depends_on:
-      - postgres
 
   postgres:
     image: postgres:17-alpine
