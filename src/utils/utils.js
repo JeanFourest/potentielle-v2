@@ -1,4 +1,3 @@
-require("dotenv").config();
 const OpenAI = require("openai");
 const client = new OpenAI({
   apiKey: process.env.OPENAI_TOKEN,

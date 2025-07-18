@@ -1,5 +1,4 @@
 const { Pool } = require("pg");
-require("dotenv").config();
 
 const pool = new Pool({
   host: process.env.PGHOST,
@@ -9,4 +8,29 @@ const pool = new Pool({
   port: process.env.PGPORT,
 });
 
-module.exports = pool;
+async function initializeDatabase() {
+  try {
+    console.log("Starting database initialization...");
+
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS messages (
+        id SERIAL PRIMARY KEY,
+        channel_id TEXT NOT NULL,
+        content TEXT NOT NULL,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+        user_id TEXT,
+        username VARCHAR(255)
+      );
+    `);
+
+    console.log("Database initialized successfully");
+  } catch (error) {
+    console.error("Database initialization failed:", error);
+    throw error;
+  }
+}
+
+module.exports = {
+  pool,
+  initializeDatabase,
+};

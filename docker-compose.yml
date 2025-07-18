@@ -1,0 +1,41 @@
+version: "3.8"
+
+services:
+  discord-bot:
+    build: .
+    container_name: potentielle-v2
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+    env_file:
+      - .env
+    volumes:
+      - ./logs:/app/logs
+    depends_on:
+      - postgres
+
+  deploy-commands:
+    build: .
+    env_file:
+      - .env
+    command: npm run deploy-commands
+    profiles:
+      - tools
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:17-alpine
+    container_name: potentielle-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${PGDATABASE}
+      POSTGRES_USER: ${PGUSER}
+      POSTGRES_PASSWORD: ${PGPASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "${PGPORT}:5432"
+
+volumes:
+  postgres_data:

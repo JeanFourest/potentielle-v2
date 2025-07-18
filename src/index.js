@@ -10,9 +10,8 @@ const {
 } = require("@discord-player/extractor");
 const { YoutubeiExtractor } = require("discord-player-youtubei");
 
-require("dotenv").config();
-
 const { execSync } = require("child_process");
+const { initializeDatabase } = require("./db/db");
 console.log(execSync("ffmpeg -version").toString());
 
 const { TOKEN } = process.env;
@@ -134,6 +133,7 @@ for (const musicFile of musicEventFiles) {
 // Initialize and start the bot
 async function startBot() {
   try {
+    await initializeDatabase();
     await initializePlayer();
     await client.login(TOKEN);
     console.log("Bot started successfully!");

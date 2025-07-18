@@ -4,8 +4,7 @@ const {
   addMessageToDatabase,
   openaiResponse,
 } = require("../utils/utils");
-
-const pool = require("../db/db");
+const { pool } = require("../db/db");
 
 module.exports = {
   name: Events.MessageCreate,
