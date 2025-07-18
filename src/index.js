@@ -11,7 +11,7 @@ const {
 const { initializeDatabase } = require("./db/db");
 const { YoutubeiExtractor } = require("discord-player-youtubei");
 
-const { TOKEN, YT_COOKIE } = process.env;
+const { TOKEN } = process.env;
 
 // Create a new client instance
 const client = new Client({
