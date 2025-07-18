@@ -10,7 +10,7 @@ const pool = new Pool({
 
 async function initializeDatabase() {
   try {
-    console.log("Starting database initialization...");
+    console.log("[DATABASE] Starting database initialization...");
 
     await pool.query(`
       CREATE TABLE IF NOT EXISTS messages (
@@ -23,9 +23,9 @@ async function initializeDatabase() {
       );
     `);
 
-    console.log("Database initialized successfully");
+    console.log("[DATABASE] Database initialized successfully");
   } catch (error) {
-    console.error("Database initialization failed:", error);
+    console.error("[ERROR] Database initialization failed:", error);
     throw error;
   }
 }

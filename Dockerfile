@@ -7,13 +7,13 @@ RUN apk add --no-cache ffmpeg
 WORKDIR /app
 
 # Copy package files
-COPY package*.json ./
+COPY package.json yarn.lock* ./
 
 # Install dependencies
-RUN npm install
+RUN yarn install --frozen-lockfile --production
 
 # Copy source code
 COPY . .
 
 # Start the bot
-CMD ["npm", "start"]
+CMD ["yarn", "start"]
