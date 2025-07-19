@@ -13,14 +13,6 @@ services:
     depends_on:
       - postgres
 
-  deploy-commands:
-    build: .
-    env_file:
-      - .env
-    command: npm run deploy-commands
-    profiles:
-      - tools
-
   postgres:
     image: postgres:17-alpine
     container_name: potentielle-db
