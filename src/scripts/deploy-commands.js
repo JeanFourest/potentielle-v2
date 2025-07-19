@@ -2,6 +2,7 @@ const { REST, Routes } = require("discord.js");
 
 const fs = require("node:fs");
 const path = require("node:path");
+require("dotenv").config();
 
 const { CLIENT_ID, GUILD_ID, TOKEN } = process.env;
 
@@ -44,8 +45,10 @@ const rest = new REST().setToken(TOKEN);
     console.log(
       `Successfully reloaded ${data.length} application (/) commands.`
     );
+    process.exit(0);
   } catch (error) {
     // And of course, make sure you catch and log any errors!
     console.error(error);
+    process.exit(1);
   }
 })();
