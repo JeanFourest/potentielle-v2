@@ -23,6 +23,16 @@ async function initializeDatabase() {
       );
     `);
 
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS news (
+        id SERIAL PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        topic TEXT NOT NULL,
+        scheduled_time TIMESTAMP WITH TIME ZONE NOT NULL,
+        recurrence TEXT
+      );
+    `);
+
     console.log("[DATABASE] Database initialized successfully");
   } catch (error) {
     console.error("[ERROR] Database initialization failed:", error);

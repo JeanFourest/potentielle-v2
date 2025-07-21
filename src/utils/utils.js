@@ -31,27 +31,28 @@ const addMessageToDatabase = async (
       [channelId, userId, username, content]
     );
     console.log("Message inserted successfully.");
-    
   } catch (e) {
     console.error("Error inserting message into database:", e);
   }
 };
 
-const openaiResponse = async (content) => {
-  let personality = "";
-
+const openaiResponse = async (content, intructions = "", tools = []) => {
   try {
-    const data = fs.readFileSync("potentielleV2Personality.txt", "utf8");
-    personality = data.trim();
+    if (intructions.length === 0) {
+      intructions = fs
+        .readFileSync("potentielleV2Personality.txt", "utf8")
+        .trim();
+    }
+    return await client.responses.create({
+      model: "gpt-4o-mini",
+      instructions: intructions,
+      input: content,
+      tools: tools,
+    });
   } catch (e) {
     console.error(e);
+    return { output_text: "An error occurred while processing your request." };
   }
-
-  return await client.responses.create({
-    model: "gpt-4.1-nano",
-    instructions: personality,
-    input: content,
-  });
 };
 
 module.exports = {
