@@ -17,3 +17,7 @@ docker-compose up --build
 
 Force rebuild without cache
 docker-compose build --no-cache
+
+docker exec -it potentielle-db psql -U postgres -d potentielle_v2
+\dt -- Check if news table exists
+\d news -- Check news table structure
