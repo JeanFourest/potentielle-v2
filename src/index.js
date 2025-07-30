@@ -1,7 +1,14 @@
 const fs = require("node:fs");
 const path = require("node:path");
-const { Client, Collection, GatewayIntentBits } = require("discord.js");
+const cron = require("node-cron");
+const {
+  Client,
+  Collection,
+  GatewayIntentBits,
+  EmbedBuilder,
+} = require("discord.js");
 const { Player } = require("discord-player");
+const { pool } = require("./db/db");
 const {
   SoundCloudExtractor,
   SpotifyExtractor,
@@ -10,6 +17,7 @@ const {
 } = require("@discord-player/extractor");
 const { initializeDatabase } = require("./db/db");
 const { YoutubeiExtractor } = require("discord-player-youtubei");
+const { openaiResponse } = require("./utils/utils");
 
 const { TOKEN } = process.env;
 
@@ -79,6 +87,100 @@ const commandFiles = fs
   .readdirSync(foldersPath)
   .filter((file) => file.endsWith(".js"));
 
+// cronjobs
+const fetchNews = async () => {
+  try {
+    // utc times
+    const now = new Date();
+
+    const currentTime = new Date(now);
+    currentTime.setUTCHours(now.getHours(), now.getMinutes(), 0, 0);
+
+    console.log(
+      `[NEWS FETCH] Checking for news at ${currentTime.toISOString()}`
+    );
+
+    const news = await pool.query(
+      `SELECT * FROM news WHERE scheduled_time = $1`,
+      [currentTime.toISOString()]
+    );
+
+    return news.rows;
+  } catch (e) {
+    console.log("[ERROR] error fetching news");
+    return [];
+  }
+};
+
+const initializeCronJobs = async () => {
+  console.log("[CRONJOB] Started cronjobs");
+  cron.schedule("* * * * *", async () => {
+    try {
+      const newsList = await fetchNews();
+      for (const news of newsList) {
+        const user = await client.users.fetch(news.user_id);
+        if (user) {
+          const newsContent = await openaiResponse(
+            [
+              {
+                role: "user",
+                content: `Get the latest news about ${
+                  news.topic || "the world"
+                }`,
+              },
+            ],
+            `You are a news aggregator. 
+          provide the latest news based on the user's request. 
+          if no country or topic is specified, provide general news about the world. 
+          format the response as a list of news articles with titles and summaries. 
+          as short as possible. 
+          always use web search to find the latest news.
+          add a separator between each news article in the following.
+          only return the top 3 news articles.
+          use the following format: 
+          "
+          **[title]**
+          [summary]
+          --END-OF-ARTICLE--
+          **[title]**
+          [summary]
+          --END-OF-ARTICLE--
+          **[title]**
+          [summary]
+          --END-OF-ARTICLE--
+          "`,
+            [{ type: "web_search_preview" }]
+          );
+
+          await user.send(`📰 news about ${news.topic}`);
+
+          for (const newsData of newsContent.output_text.split(
+            "--END-OF-ARTICLE--"
+          )) {
+            if (newsData.trim() === "") continue; // Skip empty news items
+
+            const mainEmbed = new EmbedBuilder()
+              .setDescription(newsData.trim())
+              .setColor(0x0099ff)
+              .setTimestamp()
+              .setFooter({ text: "News aggregated from web search" });
+            // Send each news item as a separate embed
+            await user.send({
+              embeds: [mainEmbed],
+            });
+          }
+        } else {
+          console.log(
+            `[NEWS ERROR] Could not fetch user with ID: ${news.user_id}`
+          );
+        }
+      }
+    } catch (error) {
+      console.log(`[ERROR NEWS] ${error}`);
+    }
+  });
+};
+
 // Loop through each command file and set it up
 for (const file of commandFiles) {
   const filePath = path.join(foldersPath, file);
@@ -138,6 +240,8 @@ async function startBot() {
     await initializePlayer();
 
     await client.login(TOKEN);
+
+    await initializeCronJobs();
   } catch (error) {
     console.error("Failed to start bot:", error);
     process.exit(1);
