@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "discord bot",
   "main": "index.js",
-  "license": "MIT",
+  "license": "",
   "scripts": {
     "start": "node src/index.js",
     "deploy-commands": "node src/scripts/deploy-commands.js"
