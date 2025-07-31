@@ -49,44 +49,6 @@ async function initializePlayer() {
   console.log("[EXTRACTOR] All extractors registered successfully.");
 }
 
-// Add debug events to understand what's happening
-player.events.on("debug", (queue, message) => {
-  console.log(`[DEBUG] ${message}`);
-});
-
-player.events.on("error", (queue, error) => {
-  console.log(`[ERROR] ${error.message}`);
-});
-
-player.events.on("playerError", (queue, error) => {
-  console.log(`[PLAYER ERROR] ${error.message}`);
-});
-
-player.events.on("audioTrackAdd", (queue, track) => {
-  console.log(`[TRACK ADDED] ${track.title} - Duration: ${track.duration}`);
-});
-
-player.events.on("audioTracksAdd", (queue, tracks) => {
-  console.log(`[TRACKS ADDED] ${tracks.length} tracks added`);
-});
-
-player.events.on("playerSkip", (queue, track) => {
-  console.log(`[PLAYER SKIP] Skipped: ${track.title}`);
-});
-
-player.events.on("emptyQueue", (queue) => {
-  console.log("[QUEUE] Queue is empty, leaving voice channel");
-});
-
-player.events.on("disconnect", (queue) => {
-  console.log("[DISCONNECT] Disconnected from voice channel");
-});
-
-const foldersPath = path.join(__dirname, "commands");
-const commandFiles = fs
-  .readdirSync(foldersPath)
-  .filter((file) => file.endsWith(".js"));
-
 // cronjobs
 const fetchNews = async () => {
   try {
@@ -181,6 +143,11 @@ const initializeCronJobs = async () => {
   });
 };
 
+const foldersPath = path.join(__dirname, "commands");
+const commandFiles = fs
+  .readdirSync(foldersPath)
+  .filter((file) => file.endsWith(".js"));
+
 // Loop through each command file and set it up
 for (const file of commandFiles) {
   const filePath = path.join(foldersPath, file);
@@ -206,27 +173,6 @@ for (const file of eventFiles) {
     client.once(event.name, (...args) => event.execute(...args));
   } else {
     client.on(event.name, (...args) => event.execute(...args));
-  }
-}
-
-const musicEventsPath = path.join(__dirname, "musicEvents");
-const musicEventFiles = fs
-  .readdirSync(musicEventsPath)
-  .filter((file) => file.endsWith(".js"));
-
-for (const musicFile of musicEventFiles) {
-  const musicFilePath = path.join(musicEventsPath, musicFile);
-  const musicEvent = require(musicFilePath);
-
-  if (musicEvent.name && musicEvent.execute) {
-    player.events.on(musicEvent.name, (...args) => musicEvent.execute(...args));
-    console.log(
-      `[MUSIC EVENT] Registered event: ${musicEvent.name} from ${musicFilePath}`
-    );
-  } else {
-    console.warn(
-      `[WARNING] The music event at ${musicFilePath} is missing a required "name" or "execute" property.`
-    );
   }
 }
 
