@@ -49,7 +49,6 @@ src/
 │   ├── news.js            # News commands
 │   └── ping.js            # Bot status
 ├── events/                # Discord event handlers
-├── musicEvents/           # Music player events
 ├── db/                    # Database configuration
 ├── scripts/               # Utility scripts
 └── utils/                 # Helper functions
