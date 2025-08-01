@@ -28,7 +28,8 @@ async function initializeDatabase() {
         id SERIAL PRIMARY KEY,
         user_id TEXT NOT NULL,
         topic TEXT NOT NULL,
-        scheduled_time TIMESTAMP WITH TIME ZONE NOT NULL
+        scheduled_hour INTEGER NOT NULL,
+        scheduled_minute INTEGER NOT NULL
       );
     `);
 
