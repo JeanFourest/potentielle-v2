@@ -36,28 +36,19 @@ module.exports = {
         try {
           const [hours, minutes] = date_time.split(":").map(Number);
           if (hours < 0 || hours > 23 || minutes < 0 || minutes > 59) {
-            throw new Error("Invalid time format: " + time);
+            throw new Error("Invalid time format: " + date_time);
           }
 
-          const now = new Date();
-
-          // Create date in UTC
-          databaseTime = new Date(
-            Date.UTC(
-              now.getFullYear(),
-              now.getMonth(),
-              now.getDate(),
-              hours,
-              minutes
-            )
-          ).toISOString();
-
           await pool.query(
-            "INSERT INTO news (user_id, topic, scheduled_time) VALUES ($1, $2, $3);",
-            [interaction.user.id, topic, databaseTime]
+            "INSERT INTO news (user_id, topic, scheduled_hour, scheduled_minute) VALUES ($1, $2, $3, $4);",
+            [interaction.user.id, topic, hours, minutes]
           );
 
-          return interaction.editReply("news registered");
+          return interaction.editReply(
+            `Daily news registered for ${date_time} UTC about ${
+              topic || "general news"
+            }`
+          );
         } catch (error) {
           console.error("error date", error);
           return interaction.editReply(

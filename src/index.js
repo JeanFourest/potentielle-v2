@@ -52,24 +52,25 @@ async function initializePlayer() {
 // cronjobs
 const fetchNews = async () => {
   try {
-    // utc times
+    // Get current UTC time
     const now = new Date();
-
-    const currentTime = new Date(now);
-    currentTime.setUTCHours(now.getHours(), now.getMinutes(), 0, 0);
+    const currentHour = now.getUTCHours();
+    const currentMinute = now.getUTCMinutes();
 
     console.log(
-      `[NEWS FETCH] Checking for news at ${currentTime.toISOString()}`
+      `[NEWS FETCH] Checking for news at ${currentHour
+        .toString()
+        .padStart(2, "0")}:${currentMinute.toString().padStart(2, "0")} UTC`
     );
 
     const news = await pool.query(
-      `SELECT * FROM news WHERE scheduled_time = $1`,
-      [currentTime.toISOString()]
+      `SELECT * FROM news WHERE scheduled_hour = $1 AND scheduled_minute = $2`,
+      [currentHour, currentMinute]
     );
 
     return news.rows;
   } catch (e) {
-    console.log("[ERROR] error fetching news");
+    console.log("[ERROR] error fetching news", e);
     return [];
   }
 };
