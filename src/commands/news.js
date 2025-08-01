@@ -46,7 +46,7 @@ module.exports = {
 
           return interaction.editReply(
             `Daily news registered for ${date_time} UTC about ${
-              topic || "general news"
+              topic || "General news"
             }`
           );
         } catch (error) {
