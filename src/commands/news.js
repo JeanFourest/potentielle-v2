@@ -29,8 +29,6 @@ module.exports = {
       const topic = interaction.options.getString("topic");
       const date_time = interaction.options.getString("date_time");
 
-      let databaseTime = null;
-
       if (date_time) {
         // Convert the time for postgreSQL
         try {
